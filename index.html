@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Association 3RGData — Données, Droit & Développement</title>
+<meta name="description" content="3RGData accompagne les acteurs publics, économiques et sociaux dans la maîtrise des données, la prise de décision éclairée et l'accès au droit. Basée à Mayotte, active à l'échelle nationale.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+/* ─── RESET & BASE ─── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+:root {
+  --navy:    #0D1F3C;
+  --navy2:   #162b52;
+  --gold:    #B8953F;
+  --gold2:   #D4AF60;
+  --gold-lt: #F5EDD8;
+  --white:   #FFFFFF;
+  --off:     #F9F8F5;
+  --off2:    #F2EFE8;
+  --text:    #1A2840;
+  --muted:   #5A6A7E;
+  --border:  #E2DDD4;
+  --radius:  4px;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--white);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── NAVIGATION ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 5%; height: 68px;
+  transition: box-shadow .3s;
+}
+nav.scrolled { box-shadow: 0 2px 24px rgba(13,31,60,0.08); }
+
+.logo { display: flex; align-items: center; text-decoration: none; }
+
+nav ul {
+  display: flex; gap: 32px; list-style: none;
+}
+nav ul a {
+  font-size: 13px; font-weight: 400; letter-spacing: .5px;
+  color: var(--muted); text-decoration: none;
+  transition: color .2s; padding-bottom: 2px;
+  border-bottom: 1.5px solid transparent;
+}
+nav ul a:hover { color: var(--navy); border-bottom-color: var(--gold); }
+
+.nav-cta {
+  background: var(--navy); color: var(--white);
+  padding: 10px 24px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500; letter-spacing: .5px;
+  text-decoration: none; transition: background .2s;
+  border-radius: var(--radius);
+}
+.nav-cta:hover { background: var(--navy2); }
+
+/* ─── HERO ─── */
+#hero {
+  min-height: 100vh;
+  background: var(--white);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  padding: 120px 5% 80px;
+  gap: 60px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg-accent {
+  position: absolute; right: 0; top: 0; bottom: 0;
+  width: 50%; background: var(--off);
+  z-index: 0;
+}
+.hero-bg-stripe {
+  position: absolute; right: 50%; top: 0; bottom: 0;
+  width: 1px; background: var(--border);
+  z-index: 1;
+}
+
+.hero-left { position: relative; z-index: 2; }
+.hero-right { position: relative; z-index: 2; }
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 11px; font-weight: 500; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--gold);
+  margin-bottom: 28px;
+}
+.hero-eyebrow::before {
+  content: ''; width: 28px; height: 1px; background: var(--gold);
+}
+
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 4.5vw, 60px);
+  font-weight: 400; line-height: 1.12;
+  color: var(--navy); margin-bottom: 28px;
+}
+h1 em { font-style: italic; color: var(--gold); }
+
+.hero-desc {
+  font-size: 16px; font-weight: 300; line-height: 1.85;
+  color: var(--muted); max-width: 500px; margin-bottom: 44px;
+}
+.hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+
+.btn-primary {
+  display: inline-block;
+  background: var(--navy); color: var(--white);
+  padding: 14px 32px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500; letter-spacing: .5px;
+  text-decoration: none; border-radius: var(--radius);
+  transition: background .2s; border: none; cursor: pointer;
+}
+.btn-primary:hover { background: var(--navy2); }
+
+.btn-ghost {
+  display: inline-block;
+  background: transparent; color: var(--navy);
+  padding: 13px 32px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 400; letter-spacing: .5px;
+  text-decoration: none; border-radius: var(--radius);
+  border: 1.5px solid var(--border); transition: border-color .2s, color .2s;
+}
+.btn-ghost:hover { border-color: var(--navy); }
+
+/* Hero right — visual card */
+.hero-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 8px 48px rgba(13,31,60,0.08);
+}
+.hero-card-header {
+  background: var(--navy);
+  padding: 32px 36px;
+}
+.hero-card-header p {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,.4); margin-bottom: 12px;
+}
+.hero-card-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; font-weight: 400; color: var(--white); line-height: 1.3;
+}
+.hero-card-header h3 em { color: var(--gold2); font-style: italic; }
+
+.hero-card-body { padding: 32px 36px; }
+
+.hero-stat-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px; background: var(--border);
+  border-radius: 6px; overflow: hidden; margin-bottom: 28px;
+}
+.hero-stat {
+  background: var(--white);
+  padding: 20px 18px; text-align: center;
+}
+.hero-stat-n {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; font-weight: 400; color: var(--navy); line-height: 1;
+}
+.hero-stat-l {
+  font-size: 11px; font-weight: 400; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--muted); margin-top: 6px;
+}
+
+.hero-zones {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.zone-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: var(--off);
+  border-radius: var(--radius);
+}
+.zone-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  flex-shrink: 0;
+}
+.zone-dot.primary { background: var(--gold); }
+.zone-dot.secondary { background: var(--navy2); opacity: .5; }
+.zone-dot.future { background: var(--border); border: 1px solid var(--muted); }
+.zone-label {
+  font-size: 13px; font-weight: 400; color: var(--text); flex: 1;
+}
+.zone-tag {
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px;
+  font-weight: 500;
+}
+.zone-tag.active { background: var(--gold-lt); color: var(--gold); }
+.zone-tag.dev { background: #EBF0F8; color: var(--navy); }
+.zone-tag.soon { background: var(--off2); color: var(--muted); }
+
+/* ─── SECTION BASE ─── */
+section { padding: 100px 5%; }
+
+.section-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 11px; font-weight: 500; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--gold); margin-bottom: 18px;
+}
+.section-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--gold); }
+
+h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(30px, 3.5vw, 46px); font-weight: 400;
+  color: var(--navy); line-height: 1.18; margin-bottom: 18px;
+}
+h2 em { font-style: italic; color: var(--gold); }
+
+.lead {
+  font-size: 16px; font-weight: 300; line-height: 1.85;
+  color: var(--muted); max-width: 580px;
+}
+
+/* ─── ABOUT ─── */
+#about { background: var(--off); }
+.about-inner {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: start;
+}
+.about-mission { margin-bottom: 40px; }
+.about-mission p {
+  font-size: 15px; font-weight: 300; line-height: 1.85; color: var(--muted);
+  margin-bottom: 16px;
+}
+.about-mission p strong { font-weight: 500; color: var(--text); }
+.about-tags {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px;
+}
+.about-tag {
+  font-size: 12px; font-weight: 400; letter-spacing: .5px;
+  padding: 6px 14px; border: 1px solid var(--border);
+  color: var(--muted); border-radius: 20px;
+  background: var(--white);
+}
+
+.about-right { display: flex; flex-direction: column; gap: 24px; }
+.about-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 6px; padding: 28px;
+}
+.about-card-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 13px; color: var(--gold); letter-spacing: 2px;
+  margin-bottom: 12px; display: block;
+}
+.about-card h4 {
+  font-size: 16px; font-weight: 500; color: var(--navy); margin-bottom: 8px;
+}
+.about-card p {
+  font-size: 14px; font-weight: 300; line-height: 1.7; color: var(--muted);
+}
+.about-id-block {
+  background: var(--navy); border-radius: 6px; padding: 24px 28px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.id-row {
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,.07); padding-bottom: 10px;
+}
+.id-row:last-child { border-bottom: none; padding-bottom: 0; }
+.id-key {
+  font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: rgba(255,255,255,.35); font-weight: 400;
+}
+.id-val {
+  font-size: 13px; font-weight: 300; color: rgba(255,255,255,.75);
+}
+
+/* ─── SERVICES ─── */
+#services { background: var(--white); }
+.services-intro {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 60px; flex-wrap: wrap; gap: 24px;
+}
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--border);
+  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+}
+.svc-card {
+  background: var(--white); padding: 40px 32px;
+  position: relative; transition: background .25s;
+  cursor: default;
+}
+.svc-card:hover { background: var(--off); }
+.svc-card:hover .svc-arrow { opacity: 1; transform: translateX(0); }
+
+.svc-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 12px; letter-spacing: 2px; color: var(--gold);
+  margin-bottom: 32px; display: block;
+}
+.svc-icon-wrap {
+  width: 44px; height: 44px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 24px; background: var(--off);
+}
+.svc-icon-wrap svg { width: 20px; height: 20px; }
+.svc-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 400; color: var(--navy);
+  margin-bottom: 14px; line-height: 1.25;
+}
+.svc-desc {
+  font-size: 14px; font-weight: 300; line-height: 1.75; color: var(--muted);
+}
+.svc-arrow {
+  position: absolute; bottom: 28px; right: 28px;
+  font-size: 18px; color: var(--gold); opacity: 0;
+  transform: translateX(-6px); transition: opacity .2s, transform .2s;
+}
+
+/* ─── JURIDIQUE ─── */
+#juridique {
+  background: var(--navy);
+  position: relative; overflow: hidden;
+}
+.jur-top-line {
+  position: absolute; top: 0; left: 5%; right: 5%;
+  height: 1px; background: linear-gradient(to right, transparent, rgba(184,149,63,.3), transparent);
+}
+.jur-grid-inner {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: start;
+}
+.jur-left { }
+.jur-left .section-eyebrow { color: var(--gold2); }
+.jur-left h2 { color: var(--white); }
+.jur-left .lead { color: rgba(255,255,255,.5); margin-bottom: 36px; }
+
+.jur-highlight {
+  background: rgba(184,149,63,.08);
+  border: 1px solid rgba(184,149,63,.15);
+  border-left: 3px solid var(--gold);
+  padding: 20px 24px; border-radius: var(--radius);
+  margin-bottom: 32px;
+}
+.jur-highlight p {
+  font-size: 13px; font-weight: 300; line-height: 1.7;
+  color: rgba(255,255,255,.5); font-style: italic;
+}
+.jur-highlight strong { color: rgba(255,255,255,.7); font-style: normal; font-weight: 500; }
+
+.jur-team {
+  display: flex; align-items: center; gap: 14px;
+  padding: 20px 24px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--radius);
+}
+.jur-team-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--navy2);
+  border: 1px solid rgba(184,149,63,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; color: var(--gold2); font-weight: 400;
+  flex-shrink: 0;
+}
+.jur-team-info p { font-size: 14px; font-weight: 500; color: var(--white); }
+.jur-team-info span { font-size: 12px; font-weight: 300; color: rgba(255,255,255,.4); }
+
+.jur-right { display: flex; flex-direction: column; gap: 14px; }
+.jur-item {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--radius); padding: 24px;
+  transition: border-color .2s, background .2s;
+}
+.jur-item:hover {
+  background: rgba(255,255,255,.07);
+  border-color: rgba(184,149,63,.2);
+}
+.jur-item-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.jur-item-title {
+  font-size: 15px; font-weight: 500; color: var(--white);
+}
+.jur-item-badge {
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 20px;
+  background: rgba(184,149,63,.12); color: var(--gold2); font-weight: 400;
+}
+.jur-item p {
+  font-size: 13px; font-weight: 300; line-height: 1.7;
+  color: rgba(255,255,255,.4);
+}
+
+/* ─── TERRITORY ─── */
+#territory { background: var(--off2); }
+.territory-inner {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center;
+}
+.territory-visual {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px; overflow: hidden;
+  aspect-ratio: 4/3;
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+}
+.territory-map {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  padding: 32px; position: relative;
+}
+.territory-map svg { width: 100%; height: 100%; }
+
+.territory-list { display: flex; flex-direction: column; gap: 12px; margin-top: 32px; }
+.territory-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px 20px; background: var(--white);
+  border: 1px solid var(--border); border-radius: var(--radius);
+}
+.t-indicator { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.t-indicator.primary { background: var(--gold); }
+.t-indicator.secondary { background: var(--navy); opacity: .45; }
+.t-indicator.future { background: transparent; border: 1.5px solid var(--border); }
+.t-name { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
+.t-note { font-size: 12px; font-weight: 300; color: var(--muted); }
+
+/* ─── VALUES ─── */
+#values { background: var(--white); }
+.values-header { text-align: center; max-width: 600px; margin: 0 auto 60px; }
+.values-header .lead { margin: 0 auto; }
+.values-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.value-card {
+  background: var(--off); border-radius: 6px;
+  padding: 36px 28px; text-align: center;
+}
+.value-icon {
+  width: 52px; height: 52px; margin: 0 auto 20px;
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+}
+.value-icon svg { width: 22px; height: 22px; stroke: var(--navy); stroke-width: 1.5; fill: none; }
+.value-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 400; color: var(--navy); margin-bottom: 10px;
+}
+.value-text {
+  font-size: 13px; font-weight: 300; line-height: 1.7; color: var(--muted);
+}
+
+/* ─── CONTACT ─── */
+#contact { background: var(--off); }
+.contact-top {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  margin-bottom: 56px; flex-wrap: wrap; gap: 20px;
+}
+.contact-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+.contact-form-wrap {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 8px; padding: 48px 44px;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.form-group { margin-bottom: 22px; }
+.form-group label {
+  display: block; font-size: 12px; font-weight: 500;
+  letter-spacing: .5px; color: var(--text); margin-bottom: 7px;
+}
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%; background: var(--off);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 11px 14px; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 300; color: var(--text);
+  outline: none; transition: border-color .2s, background .2s;
+  appearance: none;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--gold); background: var(--white);
+}
+.form-group textarea { resize: none; height: 110px; }
+.form-group select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235A6A7E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  padding-right: 36px;
+}
+.btn-submit {
+  width: 100%; background: var(--navy); color: var(--white);
+  padding: 15px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500; letter-spacing: .5px;
+  border: none; border-radius: var(--radius); cursor: pointer;
+  transition: background .2s;
+}
+.btn-submit:hover { background: var(--navy2); }
+
+.contact-right { display: flex; flex-direction: column; gap: 24px; }
+.contact-info-card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 8px; padding: 32px;
+}
+.contact-info-card h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px; font-weight: 400; color: var(--navy); margin-bottom: 20px;
+}
+.info-row {
+  display: flex; gap: 12px; margin-bottom: 14px;
+  align-items: flex-start;
+}
+.info-row:last-child { margin-bottom: 0; }
+.info-icon {
+  width: 32px; height: 32px; background: var(--off);
+  border-radius: var(--radius); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.info-icon svg { width: 15px; height: 15px; stroke: var(--navy); stroke-width: 1.5; fill: none; }
+.info-text p { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.5; }
+.info-text strong { font-weight: 500; color: var(--text); display: block; font-size: 13px; }
+.contact-assoc-card {
+  background: var(--navy); border-radius: 8px; padding: 32px;
+}
+.contact-assoc-card h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 19px; font-weight: 400; color: var(--white); margin-bottom: 20px;
+}
+.assoc-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.assoc-row:last-child { border-bottom: none; padding-bottom: 0; }
+.assoc-key { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,.35); }
+.assoc-val { font-size: 13px; font-weight: 300; color: rgba(255,255,255,.7); }
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--navy);
+  border-top: 1px solid rgba(255,255,255,.06);
+  padding: 40px 5%;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 20px;
+}
+.footer-left { display: flex; align-items: center; }
+.footer-links { display: flex; gap: 28px; }
+.footer-links a {
+  font-size: 12px; font-weight: 300;
+  color: rgba(255,255,255,.3); text-decoration: none;
+  transition: color .2s; letter-spacing: .3px;
+}
+.footer-links a:hover { color: rgba(255,255,255,.7); }
+.footer-legal {
+  font-size: 12px; font-weight: 300;
+  color: rgba(255,255,255,.2); letter-spacing: .3px;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 960px) {
+  #hero { grid-template-columns: 1fr; padding-top: 100px; }
+  .hero-bg-accent, .hero-bg-stripe { display: none; }
+  .about-inner, .jur-grid-inner, .territory-inner, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+  .services-grid { grid-template-columns: 1fr 1fr; }
+  .values-grid { grid-template-columns: 1fr 1fr; }
+  nav ul { display: none; }
+}
+@media (max-width: 600px) {
+  .services-grid, .values-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .contact-form-wrap { padding: 28px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── NAVIGATION ─── -->
+<nav id="navbar">
+  <a href="#hero" class="logo">
+    <svg width="148" height="36" viewBox="0 0 148 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Hexagone -->
+      <polygon points="18,2 30,9 30,23 18,30 6,23 6,9" fill="#0D1F3C"/>
+      <polygon points="18,5 27,10 27,22 18,27 9,22 9,10" fill="none" stroke="#B8953F" stroke-width="1.2"/>
+      <!-- Réseau nœuds -->
+      <circle cx="18" cy="16" r="2.5" fill="#B8953F"/>
+      <circle cx="11" cy="21" r="1.5" fill="#B8953F" opacity="0.75"/>
+      <circle cx="25" cy="21" r="1.5" fill="#B8953F" opacity="0.75"/>
+      <circle cx="18" cy="9"  r="1.5" fill="#B8953F" opacity="0.75"/>
+      <line x1="18" y1="16" x2="11" y2="21" stroke="#B8953F" stroke-width="0.8" opacity="0.6"/>
+      <line x1="18" y1="16" x2="25" y2="21" stroke="#B8953F" stroke-width="0.8" opacity="0.6"/>
+      <line x1="18" y1="16" x2="18" y2="9"  stroke="#B8953F" stroke-width="0.8" opacity="0.6"/>
+      <!-- Texte -->
+      <text x="38" y="20" font-family="'DM Sans',system-ui,sans-serif" font-size="14" font-weight="600" fill="#0D1F3C" letter-spacing="1.5">3RGDATA</text>
+      <text x="38" y="30" font-family="'DM Sans',system-ui,sans-serif" font-size="6.5" fill="#B8953F" letter-spacing="2.5">ASSOCIATION</text>
+    </svg>
+  </a>
+  <ul>
+    <li><a href="#about">L'association</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#juridique">Accompagnement juridique</a></li>
+    <li><a href="#territory">Territoire</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Nous contacter</a>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+  <div class="hero-bg-accent"></div>
+  <div class="hero-bg-stripe"></div>
+
+  <div class="hero-left">
+    <div class="hero-eyebrow">Données · Droit · Développement</div>
+    <h1>Décider mieux.<br>Agir <em>ensemble.</em><br>Partout en France.</h1>
+    <p class="hero-desc">
+      3RGData accompagne les acteurs publics, économiques et sociaux dans la maîtrise de leurs données, la prise de décision éclairée et l'accès au droit — depuis Mayotte jusqu'à la métropole.
+    </p>
+    <div class="hero-btns">
+      <a href="#services" class="btn-primary">Découvrir nos services</a>
+      <a href="#contact" class="btn-ghost">Prendre contact</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-card">
+      <div class="hero-card-header">
+        <p>Notre promesse</p>
+        <h3>Des décisions <em>éclairées</em> par la donnée et le droit</h3>
+      </div>
+      <div class="hero-card-body">
+        <div class="hero-stat-row">
+          <div class="hero-stat">
+            <div class="hero-stat-n">6</div>
+            <div class="hero-stat-l">Services</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-n">2025</div>
+            <div class="hero-stat-l">Fondée</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-n">360°</div>
+            <div class="hero-stat-l">Approche</div>
+          </div>
+        </div>
+        <div class="hero-zones">
+          <div class="zone-item">
+            <div class="zone-dot primary"></div>
+            <span class="zone-label">Mayotte — siège & ancrage territorial</span>
+            <span class="zone-tag active">Actif</span>
+          </div>
+          <div class="zone-item">
+            <div class="zone-dot secondary"></div>
+            <span class="zone-label">La Réunion & Océan Indien</span>
+            <span class="zone-tag dev">En développement</span>
+          </div>
+          <div class="zone-item">
+            <div class="zone-dot future"></div>
+            <span class="zone-label">Métropole — expansion nationale</span>
+            <span class="zone-tag soon">Moyen terme</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ABOUT ─── -->
+<section id="about">
+  <div class="about-inner">
+    <div class="about-left">
+      <div class="section-eyebrow">Notre association</div>
+      <h2>Une structure associative<br>au service de <em>l'intérêt général</em></h2>
+      <div class="about-mission">
+        <p>Fondée en novembre 2025 et basée à <strong>Kani-Kéli, Mayotte</strong>, l'association 3RGData est née de la conviction que la maîtrise des données et l'accès au droit sont des leviers essentiels pour un développement équitable et durable.</p>
+        <p>Portée par deux associés aux profils complémentaires — l'un ancré à Mayotte, l'autre basé à Toulouse — l'association allie expertise terrain et capacité de déploiement à l'échelle nationale.</p>
+        <p>Notre modèle est celui d'un <strong>accompagnement global</strong> : de la collecte de la donnée à la décision, de la formation initiale au conseil opérationnel, de l'accès au droit à l'insertion professionnelle.</p>
+      </div>
+      <div class="about-tags">
+        <span class="about-tag">Association loi 1901</span>
+        <span class="about-tag">Code NAF 6311Z</span>
+        <span class="about-tag">Créée en 2025</span>
+        <span class="about-tag">Kani-Kéli, Mayotte</span>
+        <span class="about-tag">Ambition nationale</span>
+      </div>
+    </div>
+    <div class="about-right">
+      <div class="about-card">
+        <span class="about-card-num">01</span>
+        <h4>Données & Décision</h4>
+        <p>Améliorer la prise de décision des acteurs publics, économiques, sociaux et environnementaux par la collecte, le traitement et l'analyse des données.</p>
+      </div>
+      <div class="about-card">
+        <span class="about-card-num">02</span>
+        <h4>Accès au droit</h4>
+        <p>Favoriser l'accès aux droits par la formation, l'information et l'accompagnement juridique de toutes personnes, physiques ou morales.</p>
+      </div>
+      <div class="about-card">
+        <span class="about-card-num">03</span>
+        <h4>Insertion & Emploi</h4>
+        <p>Améliorer l'insertion sociale et professionnelle par l'éducation, la formation et l'activité économique des personnes éloignées de l'emploi.</p>
+      </div>
+      <div class="about-id-block">
+        <div class="id-row">
+          <span class="id-key">SIREN</span>
+          <span class="id-val">995 148 384</span>
+        </div>
+        <div class="id-row">
+          <span class="id-key">Forme juridique</span>
+          <span class="id-val">Association loi 1901</span>
+        </div>
+        <div class="id-row">
+          <span class="id-key">Siège social</span>
+          <span class="id-val">24 Rue du Collège, 97625 Kani-Kéli</span>
+        </div>
+        <div class="id-row">
+          <span class="id-key">Statut</span>
+          <span class="id-val">Active depuis nov. 2025</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── SERVICES ─── -->
+<section id="services">
+  <div class="services-intro">
+    <div>
+      <div class="section-eyebrow">Ce que nous faisons</div>
+      <h2>Nos domaines d'expertise</h2>
+    </div>
+    <p class="lead" style="max-width: 380px; font-size: 15px;">Des prestations conçues pour répondre aux besoins concrets des organisations, partout en France.</p>
+  </div>
+  <div class="services-grid">
+    <div class="svc-card">
+      <span class="svc-num">01</span>
+      <div class="svc-icon-wrap">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="12" width="3" height="6" stroke="#0D1F3C" stroke-width="1.3" rx="1"/>
+          <rect x="8.5" y="7" width="3" height="11" stroke="#0D1F3C" stroke-width="1.3" rx="1"/>
+          <rect x="15" y="2" width="3" height="16" stroke="#0D1F3C" stroke-width="1.3" rx="1"/>
+        </svg>
+      </div>
+      <h3 class="svc-title">Données & Décision</h3>
+      <p class="svc-desc">Collecte, stockage, analyse et traitement des données. Audit et conseil pour aider vos organisations à décider sur la base de faits, pas d'intuitions.</p>
+      <span class="svc-arrow">→</span>
+    </div>
+    <div class="svc-card">
+      <span class="svc-num">02</span>
+      <div class="svc-icon-wrap">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 2L3 6v4c0 4.4 3.1 8.1 7 9 3.9-.9 7-4.6 7-9V6L10 2z" stroke="#0D1F3C" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M7 10l2 2 4-4" stroke="#0D1F3C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3 class="svc-title">Audit & Conseil</h3>
+      <p class="svc-desc">Diagnostic organisationnel, audit de systèmes d'information et conseil stratégique pour les structures publiques et privées.</p>
+      <span class="svc-arrow">→</span>
+    </div>
+    <div class="svc-card">
+      <span class="svc-num">03</span>
+      <div class="svc-icon-wrap">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="3" width="16" height="12" rx="1.5" stroke="#0D1F3C" stroke-width="1.3"/>
+          <path d="M7 17h6M10 15v2" stroke="#0D1F3C" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M6 8l2 2 4-4" stroke="#0D1F3C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3 class="svc-title">Formation</h3>
+      <p class="svc-desc">Programmes de formation sur mesure pour les professionnels et institutions. Culture numérique, analyse de données, droit et compétences transversales.</p>
+      <span class="svc-arrow">→</span>
+    </div>
+    <div class="svc-card">
+      <span class="svc-num">04</span>
+      <div class="svc-icon-wrap">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 4h12v9H4z" stroke="#0D1F3C" stroke-width="1.3" rx="1" stroke-linejoin="round"/>
+          <path d="M7 7h2M7 10h6M11 7h2" stroke="#0D1F3C" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M7 16l3-3 3 3" stroke="#0D1F3C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3 class="svc-title">Logiciel & Solutions</h3>
+      <p class="svc-desc">Production, développement, maintenance et assistance logiciel. Des outils construits sur-mesure, adaptés aux réalités du terrain.</p>
+      <span class="svc-arrow">→</span>
+    </div>
+    <div class="svc-card">
+      <span class="svc-num">05</span>
+      <div class="svc-icon-wrap">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="10" cy="6" r="3" stroke="#0D1F3C" stroke-width="1.3"/>
+          <path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#0D1F3C" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M14 11l1.5 1.5L17 11" stroke="#0D1F3C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3 class="svc-title">Insertion & Emploi</h3>
+      <p class="svc-desc">Accompagnement des personnes éloignées de l'emploi par l'éducation, la formation et l'activité économique. Un levier concret d'inclusion sociale.</p>
+      <span class="svc-arrow">→</span>
+    </div>
+    <div class="svc-card">
+      <span class="svc-num">06</span>
+      <div class="svc-icon-wrap">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 2l1.8 5.5H17l-4.6 3.3 1.7 5.5L10 13l-4.1 3.3 1.7-5.5L3 7.5h5.2L10 2z" stroke="#0D1F3C" stroke-width="1.3" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3 class="svc-title">Accompagnement juridique</h3>
+      <p class="svc-desc">Information, orientation et accompagnement juridique non contentieux pour faciliter l'accès au droit. Particuliers, associations et entreprises.</p>
+      <span class="svc-arrow">→</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── JURIDIQUE ─── -->
+<section id="juridique">
+  <div class="jur-top-line"></div>
+  <div class="jur-grid-inner">
+    <div class="jur-left">
+      <div class="section-eyebrow">Accompagnement juridique</div>
+      <h2>L'accès au droit,<br>pour <em>tous</em></h2>
+      <p class="lead">Sans être avocat, notre équipe vous aide à comprendre vos droits, constituer vos dossiers, rédiger vos documents et vous orienter efficacement — de manière légale et accessible.</p>
+      <br>
+      <div class="jur-highlight">
+        <p><strong>Notre cadre légal :</strong> 3RGData n'est pas un cabinet d'avocats et ne fournit pas de représentation judiciaire. Nos prestations constituent un accompagnement juridique non contentieux, légalement exercé. Pour tout litige nécessitant une représentation, nous vous orientons vers les professionnels compétents.</p>
+      </div>
+      <div class="jur-team">
+        <div class="jur-team-avatar">M</div>
+        <div class="jur-team-info">
+          <p>Expert juridique associé</p>
+          <span>Master en droit français · Basé à Mayotte</span>
+        </div>
+      </div>
+    </div>
+    <div class="jur-right">
+      <div class="jur-item">
+        <div class="jur-item-header">
+          <span class="jur-item-title">Particuliers</span>
+          <span class="jur-item-badge">Individuel</span>
+        </div>
+        <p>Compréhension de vos droits et obligations, aide à la rédaction de courriers, orientation vers les juridictions compétentes, médiation et résolution amiable des conflits.</p>
+      </div>
+      <div class="jur-item">
+        <div class="jur-item-header">
+          <span class="jur-item-title">Associations & Organismes</span>
+          <span class="jur-item-badge">Institutionnel</span>
+        </div>
+        <p>Rédaction de statuts et règlements intérieurs, accompagnement des démarches administratives, veille juridique, conseil en conformité réglementaire.</p>
+      </div>
+      <div class="jur-item">
+        <div class="jur-item-header">
+          <span class="jur-item-title">Entreprises & TPE/PME</span>
+          <span class="jur-item-badge">Professionnel</span>
+        </div>
+        <p>Aide à la compréhension des contrats, rédaction de documents courants, formalités commerciales, orientation et suivi des procédures administratives.</p>
+      </div>
+      <div class="jur-item">
+        <div class="jur-item-header">
+          <span class="jur-item-title">Droit public, Social & RGPD</span>
+          <span class="jur-item-badge">Spécialisé</span>
+        </div>
+        <p>Accompagnement dans les recours administratifs, accès aux aides sociales, droit du travail, protection des données personnelles et conformité RGPD.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TERRITORY ─── -->
+<section id="territory">
+  <div class="territory-inner">
+    <div>
+      <div class="section-eyebrow">Notre territoire</div>
+      <h2>Ancrage local,<br><em>dimension nationale</em></h2>
+      <p class="lead">Fondée à Mayotte, opérant dans l'Océan Indien, 3RGData construit progressivement une présence nationale pour apporter ses expertises partout où elles sont nécessaires.</p>
+      <div class="territory-list">
+        <div class="territory-row">
+          <div class="t-indicator primary"></div>
+          <span class="t-name">Mayotte — siège social</span>
+          <span class="t-note">24 Rue du Collège, 97625 Kani-Kéli</span>
+        </div>
+        <div class="territory-row">
+          <div class="t-indicator primary"></div>
+          <span class="t-name">Toulouse — bureau partenaire</span>
+          <span class="t-note">Présence opérationnelle métropole</span>
+        </div>
+        <div class="territory-row">
+          <div class="t-indicator secondary"></div>
+          <span class="t-name">La Réunion & Océan Indien</span>
+          <span class="t-note">Zone prioritaire de développement</span>
+        </div>
+        <div class="territory-row">
+          <div class="t-indicator future"></div>
+          <span class="t-name">France métropolitaine</span>
+          <span class="t-note">Extension à moyen terme</span>
+        </div>
+      </div>
+    </div>
+    <div class="territory-visual" style="padding:0; overflow:hidden; position:relative;">
+      <div id="map" style="width:100%; height:100%; min-height:420px;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── VALUES ─── -->
+<section id="values">
+  <div class="values-header">
+    <div class="section-eyebrow" style="justify-content:center; display: inline-flex;">Ce qui nous anime</div>
+    <h2 style="text-align:center">Nos valeurs</h2>
+    <p class="lead" style="text-align:center; margin: 0 auto;">Des principes qui guident chacune de nos interventions, quel que soit le territoire.</p>
+  </div>
+  <div class="values-grid">
+    <div class="value-card">
+      <div class="value-icon">
+        <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 2l2.3 6.9H20l-5.7 4.1 2.2 6.9L11 15.9l-5.5 4 2.2-6.9L2 9h6.7L11 2z" stroke="#0D1F3C" stroke-width="1.3" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h4 class="value-title">Intégrité</h4>
+      <p class="value-text">Rigueur, transparence et honnêteté dans chacune de nos interventions. La confiance est notre premier capital.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-icon">
+        <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="11" cy="11" r="9" stroke="#0D1F3C" stroke-width="1.3"/>
+          <path d="M7 11l3 3 5-5" stroke="#0D1F3C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h4 class="value-title">Excellence</h4>
+      <p class="value-text">Exigence professionnelle et amélioration continue. Chaque mission est une opportunité de livrer notre meilleur travail.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-icon">
+        <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 3C11 3 4 7 4 13.5C4 17 7 19.5 11 19.5C15 19.5 18 17 18 13.5C18 7 11 3 11 3Z" stroke="#0D1F3C" stroke-width="1.3"/>
+          <path d="M11 9v5M8.5 11.5h5" stroke="#0D1F3C" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h4 class="value-title">Ancrage local</h4>
+      <p class="value-text">Fièrement ancrée dans les territoires ultramarins, l'association œuvre au développement équitable de ses communautés.</p>
+    </div>
+    <div class="value-card">
+      <div class="value-icon">
+        <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="7" cy="11" r="3" stroke="#0D1F3C" stroke-width="1.3"/>
+          <circle cx="15" cy="11" r="3" stroke="#0D1F3C" stroke-width="1.3"/>
+          <path d="M10 11h2M11 5v2M11 15v2" stroke="#0D1F3C" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h4 class="value-title">Accessibilité</h4>
+      <p class="value-text">Rendre le droit, la donnée et le numérique accessibles à tous, sans distinction de niveau, de moyen ou de territoire.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONTACT ─── -->
+<section id="contact">
+  <div class="contact-top">
+    <div>
+      <div class="section-eyebrow">Parlons-nous</div>
+      <h2>Contactez-nous</h2>
+    </div>
+    <p class="lead" style="max-width: 380px; font-size: 15px;">Un projet, une question, un besoin ? Notre équipe vous répond sous 48h ouvrées.</p>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-form-wrap">
+      <!-- Bandeau succès -->
+      <div id="form-success" style="display:none; background:#F0F7F2; border:1px solid #A8D5B5; border-radius:4px; padding:24px; text-align:center; margin-bottom:20px;">
+        <p style="font-size:16px; font-weight:500; color:#1B4D2E; margin-bottom:6px;">✓ Message envoyé</p>
+        <p style="font-size:13px; font-weight:300; color:#4A7A5A;">Nous vous répondrons sous 48h ouvrées.</p>
+      </div>
+      <!-- Bandeau erreur -->
+      <div id="form-error" style="display:none; background:#FDF2F2; border:1px solid #E8A8A8; border-radius:4px; padding:14px 18px; margin-bottom:16px;">
+        <p style="font-size:13px; color:#8B2020;">Une erreur est survenue. Veuillez réessayer ou nous écrire directement à <strong>contact@3rgdata.fr</strong>.</p>
+      </div>
+      <!-- Formulaire -->
+      <div id="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-prenom">Prénom <span style="color:#B8953F">*</span></label>
+            <input id="f-prenom" type="text" placeholder="Votre prénom" required>
+          </div>
+          <div class="form-group">
+            <label for="f-nom">Nom <span style="color:#B8953F">*</span></label>
+            <input id="f-nom" type="text" placeholder="Votre nom" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="f-email">Email <span style="color:#B8953F">*</span></label>
+          <input id="f-email" type="email" placeholder="vous@organisation.fr" required>
+        </div>
+        <div class="form-group">
+          <label for="f-org">Organisation</label>
+          <input id="f-org" type="text" placeholder="Nom de votre structure (facultatif)">
+        </div>
+        <div class="form-group">
+          <label for="f-service">Service concerné</label>
+          <select id="f-service">
+            <option value="">Sélectionner un domaine</option>
+            <option>Données & Décision</option>
+            <option>Audit & Conseil</option>
+            <option>Formation</option>
+            <option>Développement logiciel</option>
+            <option>Insertion & Emploi</option>
+            <option>Accompagnement juridique</option>
+            <option>Autre / Renseignements</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="f-message">Message <span style="color:#B8953F">*</span></label>
+          <textarea id="f-message" placeholder="Décrivez brièvement votre besoin ou votre question…" required></textarea>
+        </div>
+        <button class="btn-submit" id="btn-submit" type="button" onclick="submitForm()">
+          Envoyer le message
+        </button>
+      </div>
+    </div>
+    <div class="contact-right">
+      <div class="contact-info-card">
+        <h4>Nos coordonnées</h4>
+        <div class="info-row">
+          <div class="info-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 2C5.8 2 4 3.8 4 6c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4zm0 5.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" stroke="#0D1F3C" stroke-width="1.2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="info-text">
+            <strong>Siège social — Mayotte</strong>
+            <p>24 Rue du Collège<br>97625 Kani-Kéli, Mayotte</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 2C5.8 2 4 3.8 4 6c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4zm0 5.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" stroke="#0D1F3C" stroke-width="1.2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="info-text">
+            <strong>Bureau partenaire — Métropole</strong>
+            <p>Toulouse, Occitanie<br>France métropolitaine</p>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-icon">
+            <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 4h12v8a1 1 0 01-1 1H3a1 1 0 01-1-1V4z" stroke="#0D1F3C" stroke-width="1.2"/>
+              <path d="M2 4l6 5 6-5" stroke="#0D1F3C" stroke-width="1.2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="info-text">
+            <strong>Email</strong>
+            <p>contact@3rgdata.fr</p>
+          </div>
+        </div>
+      </div>
+      <div class="contact-assoc-card">
+        <h4>Informations légales</h4>
+        <div class="assoc-row">
+          <span class="assoc-key">SIREN</span>
+          <span class="assoc-val">995 148 384</span>
+        </div>
+        <div class="assoc-row">
+          <span class="assoc-key">N° TVA</span>
+          <span class="assoc-val">FR19995148384</span>
+        </div>
+        <div class="assoc-row">
+          <span class="assoc-key">Forme</span>
+          <span class="assoc-val">Association loi 1901</span>
+        </div>
+        <div class="assoc-row">
+          <span class="assoc-key">Code APE</span>
+          <span class="assoc-val">6311Z</span>
+        </div>
+        <div class="assoc-row">
+          <span class="assoc-key">Créée le</span>
+          <span class="assoc-val">06 novembre 2025</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-left">
+    <svg width="148" height="36" viewBox="0 0 148 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="18,2 30,9 30,23 18,30 6,23 6,9" fill="#162b52"/>
+      <polygon points="18,5 27,10 27,22 18,27 9,22 9,10" fill="none" stroke="#B8953F" stroke-width="1.2"/>
+      <circle cx="18" cy="16" r="2.5" fill="#B8953F"/>
+      <circle cx="11" cy="21" r="1.5" fill="#B8953F" opacity="0.75"/>
+      <circle cx="25" cy="21" r="1.5" fill="#B8953F" opacity="0.75"/>
+      <circle cx="18" cy="9"  r="1.5" fill="#B8953F" opacity="0.75"/>
+      <line x1="18" y1="16" x2="11" y2="21" stroke="#B8953F" stroke-width="0.8" opacity="0.6"/>
+      <line x1="18" y1="16" x2="25" y2="21" stroke="#B8953F" stroke-width="0.8" opacity="0.6"/>
+      <line x1="18" y1="16" x2="18" y2="9"  stroke="#B8953F" stroke-width="0.8" opacity="0.6"/>
+      <text x="38" y="20" font-family="'DM Sans',system-ui,sans-serif" font-size="14" font-weight="600" fill="#FFFFFF" letter-spacing="1.5">3RGDATA</text>
+      <text x="38" y="30" font-family="'DM Sans',system-ui,sans-serif" font-size="6.5" fill="#B8953F" letter-spacing="2.5">ASSOCIATION</text>
+    </svg>
+  </div>
+  <div class="footer-links">
+    <a href="#about">L'association</a>
+    <a href="#services">Services</a>
+    <a href="#juridique">Accompagnement juridique</a>
+    <a href="#territory">Territoire</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <p class="footer-legal">© 2025–2026 Association 3RGData · SIREN 995 148 384 · Kani-Kéli, Mayotte</p>
+</footer>
+
+<script>
+const nav = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 40) nav.classList.add('scrolled');
+  else nav.classList.remove('scrolled');
+});
+
+function initMap() {
+  const map = L.map('map', {
+    scrollWheelZoom: false,
+    zoomControl: true,
+    attributionControl: true,
+    dragging: true,
+  }).setView([20, 30], 2);
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 19
+  }).addTo(map);
+
+  const iconOr = L.divIcon({
+    className: '',
+    html: `<div style="width:14px;height:14px;border-radius:50%;background:#B8953F;border:3px solid #fff;box-shadow:0 0 0 2px #B8953F,0 2px 8px rgba(0,0,0,.25);"></div>`,
+    iconSize: [14,14], iconAnchor: [7,7], popupAnchor: [0,-10]
+  });
+  const iconNavy = L.divIcon({
+    className: '',
+    html: `<div style="width:12px;height:12px;border-radius:50%;background:#0D1F3C;border:3px solid #fff;box-shadow:0 0 0 2px rgba(13,31,60,.5),0 2px 8px rgba(0,0,0,.25);"></div>`,
+    iconSize: [12,12], iconAnchor: [6,6], popupAnchor: [0,-10]
+  });
+  const iconGris = L.divIcon({
+    className: '',
+    html: `<div style="width:11px;height:11px;border-radius:50%;background:#8A9AB0;border:3px solid #fff;box-shadow:0 0 0 2px rgba(138,154,176,.4),0 2px 8px rgba(0,0,0,.2);"></div>`,
+    iconSize: [11,11], iconAnchor: [5,5], popupAnchor: [0,-10]
+  });
+
+  const popupOpts = { closeButton: false, className: 'map-popup' };
+
+  L.marker([-12.8, 45.17], { icon: iconOr })
+    .addTo(map)
+    .bindPopup('<strong>Mayotte</strong><br>Siège social — Kani-Kéli, 97625', popupOpts);
+  L.marker([43.6, 1.44], { icon: iconNavy })
+    .addTo(map)
+    .bindPopup('<strong>Toulouse</strong><br>Bureau partenaire — Métropole', popupOpts);
+  L.marker([-21.1, 55.5], { icon: iconGris })
+    .addTo(map)
+    .bindPopup('<strong>La Réunion</strong><br>Zone prioritaire de développement', popupOpts);
+
+  const style = document.createElement('style');
+  style.textContent = `.map-popup .leaflet-popup-content-wrapper{border-radius:6px;padding:0;box-shadow:0 4px 20px rgba(13,31,60,.15);font-family:'DM Sans',sans-serif}.map-popup .leaflet-popup-content{margin:10px 14px;font-size:13px;line-height:1.5;color:#1A2840}.map-popup .leaflet-popup-content strong{font-weight:500;display:block}.map-popup .leaflet-popup-tip{background:#fff}`;
+  document.head.appendChild(style);
+}
+
+const leafletScript = document.createElement('script');
+leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+leafletScript.onload = initMap;
+document.head.appendChild(leafletScript);
+
+// ── Formulaire de contact (Formspree) ──
+const FORMSPREE_ENDPOINT = 'https://formspree.io/f/mlgzebkl';
+
+async function submitForm() {
+  const btn    = document.getElementById('btn-submit');
+  const errDiv = document.getElementById('form-error');
+  const okDiv  = document.getElementById('form-success');
+
+  // Champs requis
+  const prenom  = document.getElementById('f-prenom').value.trim();
+  const nom     = document.getElementById('f-nom').value.trim();
+  const email   = document.getElementById('f-email').value.trim();
+  const message = document.getElementById('f-message').value.trim();
+
+  errDiv.style.display = 'none';
+
+  if (!prenom || !nom || !email || !message) {
+    errDiv.querySelector('p').textContent = 'Merci de remplir tous les champs obligatoires (marqués *).';
+    errDiv.style.display = 'block';
+    return;
+  }
+
+  // État chargement
+  btn.disabled = true;
+  btn.textContent = 'Envoi en cours…';
+  btn.style.opacity = '0.7';
+
+  const data = {
+    prenom,
+    nom,
+    email,
+    organisation: document.getElementById('f-org').value.trim(),
+    service:      document.getElementById('f-service').value,
+    message,
+  };
+
+  try {
+    const res = await fetch(FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (res.ok) {
+      document.getElementById('contact-form').style.display = 'none';
+      okDiv.style.display = 'block';
+    } else {
+      throw new Error('Réponse serveur : ' + res.status);
+    }
+  } catch (e) {
+    errDiv.querySelector('p').innerHTML = 'Une erreur est survenue. Veuillez réessayer ou nous écrire à <strong>contact@3rgdata.fr</strong>.';
+    errDiv.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Envoyer le message';
+    btn.style.opacity = '1';
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+  <!-- Version horizontale fond clair -->
+  <!-- Hexagone emblème -->
+  <polygon points="40,60 58,49 76,60 76,82 58,93 40,82" fill="#0D1F3C"/>
+  <polygon points="40,63 56,53 72,63 72,79 56,89 40,79" fill="none" stroke="#B8953F" stroke-width="1.5"/>
+  <!-- Réseau de nœuds -->
+  <circle cx="58" cy="71" r="3.5" fill="#B8953F"/>
+  <circle cx="47" cy="80" r="2" fill="#B8953F" opacity="0.75"/>
+  <circle cx="69" cy="80" r="2" fill="#B8953F" opacity="0.75"/>
+  <circle cx="58" cy="58" r="2" fill="#B8953F" opacity="0.75"/>
+  <line x1="58" y1="71" x2="47" y2="80" stroke="#B8953F" stroke-width="1" opacity="0.6"/>
+  <line x1="58" y1="71" x2="69" y2="80" stroke="#B8953F" stroke-width="1" opacity="0.6"/>
+  <line x1="58" y1="71" x2="58" y2="58" stroke="#B8953F" stroke-width="1" opacity="0.6"/>
+  <!-- Nom -->
+  <text x="92" y="67" font-family="'DM Sans', 'Jost', system-ui, sans-serif" font-size="24" font-weight="600" fill="#0D1F3C" letter-spacing="2">3RGDATA</text>
+  <text x="92" y="82" font-family="'DM Sans', 'Jost', system-ui, sans-serif" font-size="9" fill="#B8953F" letter-spacing="4">ASSOCIATION</text>
+  <!-- Séparateur vertical -->
+  <line x1="235" y1="50" x2="235" y2="90" stroke="#E2DDD4" stroke-width="1"/>
+  <!-- Tagline -->
+  <text x="250" y="65" font-family="'DM Sans', 'Jost', system-ui, sans-serif" font-size="9" fill="#8A9AB0" letter-spacing="1.2">DONNÉES · DROIT · DÉVELOPPEMENT</text>
+  <text x="250" y="80" font-family="'DM Sans', 'Jost', system-ui, sans-serif" font-size="8.5" fill="#A0AEBE" letter-spacing="0.5">Mayotte — France</text>
+</svg>
