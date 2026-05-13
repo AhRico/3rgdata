@@ -581,11 +581,150 @@ footer {
   color: rgba(255,255,255,.2); letter-spacing: .3px;
 }
 
-/* ─── RESPONSIVE ─── */
+/* ─── IA & DATA ─── */
+#ia {
+  background: var(--navy);
+  position: relative; overflow: hidden;
+}
+.ia-glow {
+  position: absolute; top: -120px; right: -80px;
+  width: 500px; height: 500px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(184,149,63,.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.ia-grid-inner {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 80px; align-items: center; position: relative; z-index: 1;
+}
+.ia-left .section-eyebrow { color: var(--gold2); }
+.ia-left h2 { color: var(--white); margin-bottom: 20px; }
+.ia-left .lead { color: rgba(255,255,255,.55); margin-bottom: 36px; }
+.ia-pitch {
+  background: rgba(184,149,63,.07);
+  border: 1px solid rgba(184,149,63,.18);
+  border-left: 3px solid var(--gold);
+  padding: 20px 24px; border-radius: var(--radius);
+  margin-bottom: 32px;
+}
+.ia-pitch p { font-size: 14px; font-weight: 300; line-height: 1.75; color: rgba(255,255,255,.6); }
+.ia-pitch strong { color: var(--gold2); font-weight: 500; }
+.ia-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+.btn-gold {
+  display: inline-block;
+  background: var(--gold); color: var(--navy);
+  padding: 13px 28px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500; letter-spacing: .5px;
+  text-decoration: none; border-radius: var(--radius);
+  border: none; cursor: pointer; transition: background .2s;
+}
+.btn-gold:hover { background: var(--gold2); }
+.btn-outline-light {
+  display: inline-block;
+  background: transparent; color: rgba(255,255,255,.7);
+  padding: 12px 28px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 400; letter-spacing: .5px;
+  text-decoration: none; border-radius: var(--radius);
+  border: 1px solid rgba(255,255,255,.2); transition: border-color .2s, color .2s;
+}
+.btn-outline-light:hover { border-color: var(--gold); color: var(--gold2); }
+
+.ia-right { display: flex; flex-direction: column; gap: 14px; }
+.ia-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: var(--radius); padding: 22px 24px;
+  display: flex; gap: 16px; align-items: flex-start;
+  transition: background .2s, border-color .2s;
+}
+.ia-card:hover { background: rgba(255,255,255,.07); border-color: rgba(184,149,63,.2); }
+.ia-card-icon {
+  width: 40px; height: 40px; flex-shrink: 0;
+  background: rgba(184,149,63,.1);
+  border: 1px solid rgba(184,149,63,.2);
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+}
+.ia-card-icon svg { width: 18px; height: 18px; stroke: var(--gold2); stroke-width: 1.5; fill: none; }
+.ia-card-body h4 { font-size: 14px; font-weight: 500; color: var(--white); margin-bottom: 6px; }
+.ia-card-body p { font-size: 13px; font-weight: 300; line-height: 1.65; color: rgba(255,255,255,.4); }
+
+/* ─── COOKIE BANNER ─── */
+#cookie-banner {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 9000;
+  background: var(--navy);
+  border-top: 1px solid rgba(184,149,63,.2);
+  padding: 20px 5%;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+  box-shadow: 0 -4px 32px rgba(0,0,0,.2);
+  transform: translateY(100%);
+  transition: transform .4s ease;
+}
+#cookie-banner.visible { transform: translateY(0); }
+.cookie-text { flex: 1; min-width: 260px; }
+.cookie-text p {
+  font-size: 13px; font-weight: 300; line-height: 1.65;
+  color: rgba(255,255,255,.6);
+}
+.cookie-text a { color: var(--gold2); text-decoration: underline; cursor: pointer; }
+.cookie-btns { display: flex; gap: 10px; flex-shrink: 0; }
+.cookie-accept {
+  background: var(--gold); color: var(--navy);
+  padding: 10px 24px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 500; border: none;
+  border-radius: var(--radius); cursor: pointer; transition: background .2s;
+}
+.cookie-accept:hover { background: var(--gold2); }
+.cookie-refuse {
+  background: transparent; color: rgba(255,255,255,.5);
+  padding: 10px 20px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 300; border: 1px solid rgba(255,255,255,.15);
+  border-radius: var(--radius); cursor: pointer; transition: all .2s;
+}
+.cookie-refuse:hover { border-color: rgba(255,255,255,.4); color: rgba(255,255,255,.8); }
+
+/* ─── MODAL RGPD ─── */
+#modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 9500;
+  background: rgba(13,31,60,.7); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center; padding: 20px;
+}
+#modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--white); border-radius: 8px;
+  max-width: 720px; width: 100%; max-height: 85vh;
+  overflow-y: auto; padding: 48px;
+  position: relative;
+}
+.modal-close {
+  position: absolute; top: 20px; right: 20px;
+  background: none; border: none; font-size: 22px;
+  color: var(--muted); cursor: pointer; line-height: 1;
+}
+.modal-close:hover { color: var(--text); }
+.modal-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; font-weight: 400; color: var(--navy); margin-bottom: 6px;
+}
+.modal-box .modal-date {
+  font-size: 12px; color: var(--muted); margin-bottom: 28px; display: block;
+}
+.modal-box h4 {
+  font-size: 14px; font-weight: 600; color: var(--navy);
+  margin: 24px 0 8px; text-transform: uppercase; letter-spacing: .5px;
+}
+.modal-box p, .modal-box li {
+  font-size: 14px; font-weight: 300; line-height: 1.75; color: var(--muted);
+}
+.modal-box ul { padding-left: 20px; margin-top: 6px; }
+.modal-box li { margin-bottom: 6px; }
+.modal-box a { color: var(--gold); }
+.modal-sep { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
 @media (max-width: 960px) {
   #hero { grid-template-columns: 1fr; padding-top: 100px; }
   .hero-bg-accent, .hero-bg-stripe { display: none; }
-  .about-inner, .jur-grid-inner, .territory-inner, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
+  .about-inner, .jur-grid-inner, .ia-grid-inner, .territory-inner, .contact-grid { grid-template-columns: 1fr; gap: 40px; }
   .services-grid { grid-template-columns: 1fr 1fr; }
   .values-grid { grid-template-columns: 1fr 1fr; }
   nav ul { display: none; }
@@ -622,6 +761,7 @@ footer {
   <ul>
     <li><a href="#about">L'association</a></li>
     <li><a href="#services">Services</a></li>
+    <li><a href="#ia">IA & Data</a></li>
     <li><a href="#juridique">Accompagnement juridique</a></li>
     <li><a href="#territory">Territoire</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -830,6 +970,63 @@ footer {
       <h3 class="svc-title">Accompagnement juridique</h3>
       <p class="svc-desc">Information, orientation et accompagnement juridique non contentieux pour faciliter l'accès au droit. Particuliers, associations et entreprises.</p>
       <span class="svc-arrow">→</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── IA & DATA ─── -->
+<section id="ia">
+  <div class="ia-glow"></div>
+  <div class="ia-grid-inner">
+    <div class="ia-left">
+      <div class="section-eyebrow">Intelligence Artificielle & Data</div>
+      <h2>L'IA au cœur de<br><em>votre organisation</em></h2>
+      <p class="lead">Vous n'avez pas besoin de créer l'IA. Vous avez besoin de l'exploiter — avec vos propres données, pour vos propres enjeux.</p>
+      <div class="ia-pitch">
+        <p>3RGData accompagne les <strong>PME, TPE, collectivités et associations</strong> dans l'intégration concrète de l'IA : identifier les bons cas d'usage, connecter vos données existantes, déployer des outils adaptés à votre réalité terrain — sans jargon, sans sur-ingénierie.</p>
+      </div>
+      <div class="ia-btns">
+        <a href="#contact" class="btn-gold">Évaluer votre potentiel IA</a>
+        <a href="#services" class="btn-outline-light">Voir nos services</a>
+      </div>
+    </div>
+    <div class="ia-right">
+      <div class="ia-card">
+        <div class="ia-card-icon">
+          <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.93 4.93l1.41 1.41M13.66 13.66l1.41 1.41M4.93 15.07l1.41-1.41M13.66 6.34l1.41-1.41"/></svg>
+        </div>
+        <div class="ia-card-body">
+          <h4>Audit IA & maturité data</h4>
+          <p>Évaluation de vos données existantes, identification des cas d'usage à fort impact, feuille de route personnalisée.</p>
+        </div>
+      </div>
+      <div class="ia-card">
+        <div class="ia-card-icon">
+          <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="3" width="16" height="14" rx="2"/><path d="M6 8h8M6 12h5"/></svg>
+        </div>
+        <div class="ia-card-body">
+          <h4>Intégration d'outils IA</h4>
+          <p>Déploiement de solutions IA sur vos données métier : automatisation, analyse documentaire, aide à la décision, chatbots internes.</p>
+        </div>
+      </div>
+      <div class="ia-card">
+        <div class="ia-card-icon">
+          <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2L3 6v4c0 4.4 3.1 8.1 7 9 3.9-.9 7-4.6 7-9V6L10 2z"/></svg>
+        </div>
+        <div class="ia-card-body">
+          <h4>IA & conformité RGPD</h4>
+          <p>Intégration de l'IA dans le respect du cadre légal : gouvernance des données, anonymisation, documentation des traitements.</p>
+        </div>
+      </div>
+      <div class="ia-card">
+        <div class="ia-card-icon">
+          <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div class="ia-card-body">
+          <h4>Formation & acculturation IA</h4>
+          <p>Sensibilisation de vos équipes, ateliers pratiques, montée en compétences sur les outils IA du quotidien (LLM, automatisation, analyse).</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1101,6 +1298,30 @@ footer {
   </div>
 </section>
 
+<!-- ─── COOKIE BANNER ─── -->
+<div id="cookie-banner">
+  <div class="cookie-text">
+    <p>
+      Nous utilisons des cookies analytiques (Leaflet Maps) pour améliorer votre expérience.
+      Aucune donnée personnelle n'est transmise à des tiers à des fins publicitaires.
+      <a onclick="openModal('mentions')">Mentions légales</a> ·
+      <a onclick="openModal('confidentialite')">Politique de confidentialité</a>
+    </p>
+  </div>
+  <div class="cookie-btns">
+    <button class="cookie-refuse" onclick="closeCookieBanner(false)">Refuser</button>
+    <button class="cookie-accept" onclick="closeCookieBanner(true)">Accepter</button>
+  </div>
+</div>
+
+<!-- ─── MODAL RGPD ─── -->
+<div id="modal-overlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
 <!-- ─── FOOTER ─── -->
 <footer>
   <div class="footer-left">
@@ -1121,11 +1342,16 @@ footer {
   <div class="footer-links">
     <a href="#about">L'association</a>
     <a href="#services">Services</a>
+    <a href="#ia">IA & Data</a>
     <a href="#juridique">Accompagnement juridique</a>
     <a href="#territory">Territoire</a>
     <a href="#contact">Contact</a>
   </div>
-  <p class="footer-legal">© 2025–2026 Association 3RGData · SIREN 995 148 384 · Kani-Kéli, Mayotte</p>
+  <p class="footer-legal">
+    © 2025–2026 Association 3RGData · SIREN 995 148 384 · Kani-Kéli, Mayotte ·
+    <a onclick="openModal('mentions')" style="color:rgba(255,255,255,.35);text-decoration:underline;cursor:pointer;">Mentions légales</a> ·
+    <a onclick="openModal('confidentialite')" style="color:rgba(255,255,255,.35);text-decoration:underline;cursor:pointer;">Confidentialité</a>
+  </p>
 </footer>
 
 <script>
@@ -1182,7 +1408,102 @@ function initMap() {
   document.head.appendChild(style);
 }
 
-const leafletScript = document.createElement('script');
+// ── Cookies ──
+const COOKIE_KEY = '3rgdata_cookies';
+const banner = document.getElementById('cookie-banner');
+
+if (!localStorage.getItem(COOKIE_KEY)) {
+  setTimeout(() => banner.classList.add('visible'), 800);
+}
+
+function closeCookieBanner(accepted) {
+  localStorage.setItem(COOKIE_KEY, accepted ? 'accepted' : 'refused');
+  banner.classList.remove('visible');
+}
+
+// ── Modal RGPD ──
+const MODAL_CONTENT = {
+  mentions: `
+    <h3>Mentions légales</h3>
+    <span class="modal-date">Mise à jour : mai 2026</span>
+
+    <h4>Éditeur du site</h4>
+    <p><strong>Association 3RGData</strong><br>
+    24 Rue du Collège — 97625 Kani-Kéli, Mayotte<br>
+    SIREN : 995 148 384 · Code APE : 6311Z<br>
+    Email : contact@3rgdata.fr</p>
+
+    <hr class="modal-sep">
+    <h4>Hébergement</h4>
+    <p>Ce site est hébergé par <strong>GitHub Pages</strong> (GitHub Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, États-Unis). Pour toute question relative à l'hébergement : <a href="https://pages.github.com" target="_blank">pages.github.com</a></p>
+
+    <hr class="modal-sep">
+    <h4>Directeur de la publication</h4>
+    <p>Les co-fondateurs de l'association 3RGData, conformément aux statuts déposés.</p>
+
+    <hr class="modal-sep">
+    <h4>Propriété intellectuelle</h4>
+    <p>L'ensemble des contenus de ce site (textes, logo, visuels) est la propriété exclusive de l'Association 3RGData. Toute reproduction, même partielle, est interdite sans autorisation écrite préalable.</p>
+
+    <hr class="modal-sep">
+    <h4>Limitation de responsabilité</h4>
+    <p>L'association 3RGData s'efforce d'assurer l'exactitude et la mise à jour des informations publiées sur ce site. Elle ne saurait être tenue responsable des erreurs, omissions ou résultats obtenus par un mauvais usage de ces informations.</p>
+  `,
+  confidentialite: `
+    <h3>Politique de confidentialité</h3>
+    <span class="modal-date">Mise à jour : mai 2026 · Conforme au RGPD (Règlement UE 2016/679)</span>
+
+    <h4>Responsable du traitement</h4>
+    <p>Association 3RGData — 24 Rue du Collège, 97625 Kani-Kéli, Mayotte<br>
+    Contact : contact@3rgdata.fr</p>
+
+    <hr class="modal-sep">
+    <h4>Données collectées</h4>
+    <p>Ce site collecte des données uniquement dans les cas suivants :</p>
+    <ul>
+      <li><strong>Formulaire de contact :</strong> prénom, nom, email, organisation, objet, message. Ces données sont transmises via Formspree (service tiers, voir leur <a href="https://formspree.io/legal/privacy-policy" target="_blank">politique de confidentialité</a>) et utilisées uniquement pour répondre à votre demande.</li>
+      <li><strong>Carte interactive :</strong> Leaflet.js charge des tuiles cartographiques depuis les serveurs de CartoDB/OpenStreetMap. Votre adresse IP peut être transmise à ces services tiers lors du chargement de la carte.</li>
+    </ul>
+
+    <hr class="modal-sep">
+    <h4>Cookies</h4>
+    <p>Ce site utilise un cookie technique de première partie (<code>3rgdata_cookies</code>) pour mémoriser votre choix de consentement. Aucun cookie publicitaire ou de tracking n'est utilisé.</p>
+
+    <hr class="modal-sep">
+    <h4>Base légale des traitements</h4>
+    <ul>
+      <li>Formulaire de contact : <em>intérêt légitime</em> (répondre à votre demande)</li>
+      <li>Cookie de consentement : <em>obligation légale</em></li>
+    </ul>
+
+    <hr class="modal-sep">
+    <h4>Durée de conservation</h4>
+    <p>Les données du formulaire de contact sont conservées le temps nécessaire au traitement de votre demande, et au maximum 3 ans. Le cookie de consentement expire après 13 mois.</p>
+
+    <hr class="modal-sep">
+    <h4>Vos droits</h4>
+    <p>Conformément au RGPD, vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition et de portabilité de vos données. Pour exercer ces droits, contactez-nous à <strong>contact@3rgdata.fr</strong>. Vous pouvez également introduire une réclamation auprès de la <a href="https://www.cnil.fr" target="_blank">CNIL</a>.</p>
+
+    <hr class="modal-sep">
+    <h4>Transferts hors UE</h4>
+    <p>Formspree et GitHub Pages sont des services américains soumis au cadre adéquat UE–États-Unis (Data Privacy Framework). CartoDB et OpenStreetMap sont des services européens.</p>
+  `
+};
+
+function openModal(type) {
+  document.getElementById('modal-content').innerHTML = MODAL_CONTENT[type] || '';
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
 leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
 leafletScript.onload = initMap;
 document.head.appendChild(leafletScript);
